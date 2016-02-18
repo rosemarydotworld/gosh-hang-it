@@ -10,9 +10,6 @@
     "type": "git",
     "url": "git+https://github.com/liamdanger/gosh-hang-it.git"
   },
-  "devDependencies": {
-    "polyfill": "0.1.0"
-  },
   "keywords": [
     "typography",
     "polyfill"
