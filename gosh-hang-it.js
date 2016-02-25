@@ -4,53 +4,13 @@
   "use strict";
 
   // Array of hangable punctuation characters
-  // List comes from spec: https://www.w3.org/TR/css3-text/#hanging-punctuation
   var hangables = ['\'', '"', '‘', '’', '“', '”', ',', '.', '،', '۔', '、', '。', '，', '．', '﹐', '﹑', '﹒', '｡', '､'];
-
-  // Hangable object
-  function Hangable(el, matchedEl) {
-    this.el = el;
-    this.container = matchedEl;
-
-    this.width = this.getRelativeWidth();
-
-    this.hang();
-  }
-
-  Hangable.prototype.getRelativePosition = function() {
-    var containerOffset, elOffset;
-
-    containerOffset = this.getContainerTrueOffset();
-    elOffset = this.el.offsetLeft;
-
-    return elOffset - containerOffset;
-  }
-
-  Hangable.prototype.getRelativeWidth = function() {
-    return this.el.offsetWidth;
-  }
-
-  Hangable.prototype.hang = function() {
-    if (this.getRelativePosition() == 0) {
-      this.el.style.marginLeft = (-1 * this.getRelativeWidth()) + 'px';
-    }
-  }
-
-  Hangable.prototype.getContainerTrueOffset = function() {
-    // Borders count toward the offset, believe it or not
-
-    var containerOffset = this.container.offsetLeft,
-        containerStyle,
-        containerBorder;
-
-    containerStyle = getComputedStyle(this.container, null);
-    containerBorder = containerStyle.getPropertyValue('border-left-width');
-
-    return containerOffset + parseInt(containerBorder, 10);
-  }
 
   // Monolithic objecty thing
   var gosh = {};
+
+  // Array of Hangable objects will live here
+  gosh.chars = [];
 
   gosh.wrapHangables = function(el) {
     // Wrap hangable characters in an easily queryable and styleable span
@@ -82,7 +42,7 @@
     }
   }
 
-  gosh.instantiateHangables = function(matchedEl) {
+  gosh.instantiateHangables = function() {
     // Make a new Hangable object to manage each hangable character
 
     var chars = document.querySelectorAll('[data-hang]');
@@ -90,7 +50,7 @@
     for (var i = 0; i < chars.length; ++i) {
       var char = chars[i];
 
-      var hangable = new Hangable(char, matchedEl);
+      var hangable = new Hangable(char);
     }
   }
 
@@ -99,7 +59,7 @@
       var matchedEl = document.querySelectorAll( rule.getSelectors() )[0];
 
       gosh.wrapHangables(matchedEl);
-      gosh.instantiateHangables(matchedEl);
+      gosh.instantiateHangables();
     });
   }
 
@@ -107,12 +67,61 @@
 
   }
 
+  // Hangable object
+  function Hangable(el) {
+    this.el = el;
+    this.container = this.getFirstBlockParent();
+
+    this.width = this.getRelativeWidth();
+    this.hang();
+
+    gosh.chars.push(this);
+  }
+
+  Hangable.prototype.getFirstBlockParent = function() {
+    var el = this.el;
+
+    // Loop through parent nodes until we find a block, or close enough
+    while (el.parentNode) {
+      el = el.parentNode;
+      var display = getComputedStyle(el).display;
+
+      if (display == "block" || display == "flex" || display == "grid") {
+        return el;
+      }
+    }
+  }
+
+  Hangable.prototype.getRelativePosition = function() {
+    var containerOffset, elOffset;
+
+    containerOffset = this.getContainerTrueOffset();
+    elOffset = this.el.offsetLeft;
+
+    this.el.setAttribute('data-hang-position', elOffset - containerOffset);
+    return elOffset - containerOffset;
+  }
+
+  Hangable.prototype.getRelativeWidth = function() {
+    return this.el.offsetWidth;
+  }
+
+  Hangable.prototype.hang = function() {
+    if (this.getRelativePosition() == 0) {
+      this.el.style.marginLeft = (-1 * this.getRelativeWidth()) + 'px';
+    }
+  }
+
+  Hangable.prototype.getContainerTrueOffset = function() {
+    // Borders count toward the offset, believe it or not
+
+    var containerOffset = this.container.offsetLeft + this.container.clientLeft;
+    return containerOffset;
+  }
+
   // Set up the polyfill
   Polyfill({
-    declarations: [
-      "hanging-punctuation:first",
-      "hanging-punctuation:last"
-    ]
+    declarations: ["hanging-punctuation:first"]
   }, {
     include: ["position-sticky"]
   })
