@@ -16,21 +16,42 @@
   var gosh = {};
 
   gosh.wrapHangables = function(el) {
-    var text = el[0].textContent,
+    var nodes = el.childNodes,
         matchChars = new RegExp('[' + hangables.join('|') + ']', 'g');
 
-    text = text.replace(matchChars, function(match) {
-      return '<span style="color: red;">' + match + '</span>';
-    });
+    for (var i = 0; i < nodes.length; ++i) {
+      var node = nodes[i];
 
-    console.log(text);
+      if(node.nodeType == 1) {
+        // Recurse elements: gotta get to the juicy text nodes inside the HTML
+        gosh.wrapHangables(node);
+      } else if(node.nodeType == 3) {
+        // For text nodes, wrap the hangable characters in spans and then wrap
+        // that whole mess in another span so we can operate upon it in HTML
+        var text = node.textContent,
+            temp = document.createElement('span');
 
-    el[0].innerHTML = text; // ain't this going to break everything?
+        text = text.replace(matchChars, function(match) {
+          return '<span data-hang style="color: red;">' + match + '</span>';
+        });
+
+        temp.innerHTML = text;
+
+        node.parentElement.insertBefore(temp, node);
+        node.parentElement.removeChild(node);
+      }
+    }
+  }
+
+  gosh.instantiateHangables = function() {
+    var hangables = document.querySelectorAll('[data-hang]');
+    console.log(hangables);
   }
 
   gosh.doMatched = function(rules) {
     rules.each(function(rule) {
-      gosh.wrapHangables(document.querySelectorAll( rule.getSelectors() ));
+      gosh.wrapHangables(document.querySelectorAll( rule.getSelectors() )[0]);
+      gosh.instantiateHangables();
     });
   }
 
