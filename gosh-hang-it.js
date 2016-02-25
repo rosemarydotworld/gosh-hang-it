@@ -5,22 +5,36 @@
 
   // Array of hangable punctuation characters
   // List comes from spec: https://www.w3.org/TR/css3-text/#hanging-punctuation
-  var hangables = ['\U002C', '\U002E', '\U060C', '\U06D4', '\U3001', '\U3002', '\UFF0C', '\UFF0E', '\UFE50', '\UFE51', '\UFE52', '\UFF61', '\UFF64'];
+  var hangables = ['\'', '"', '‘', '’', '“', '”', ',', '.', '،', '۔', '、', '。', '，', '．', '﹐', '﹑', '﹒', '｡', '､'];
 
-  // Monolithic objecty thing
-  var gh = {};
-
-  gh.wrapHangables = function(el) {
-    // Finds hangable characters in the element and wraps them in <span>s
+  // Hangable object
+  function Hangable(el) {
+    this.el = el;
   }
 
-  gh.doMatched = function(rules) {
+  // Monolithic objecty thing
+  var gosh = {};
+
+  gosh.wrapHangables = function(el) {
+    var text = el[0].textContent,
+        matchChars = new RegExp('[' + hangables.join('|') + ']', 'g');
+
+    text = text.replace(matchChars, function(match) {
+      return '<span style="color: red;">' + match + '</span>';
+    });
+
+    console.log(text);
+
+    el[0].innerHTML = text; // ain't this going to break everything?
+  }
+
+  gosh.doMatched = function(rules) {
     rules.each(function(rule) {
-      console.log(rule);
+      gosh.wrapHangables(document.querySelectorAll( rule.getSelectors() ));
     });
   }
 
-  gh.undoUnmatched = function(rules) {
+  gosh.undoUnmatched = function(rules) {
 
   }
 
@@ -33,10 +47,10 @@
   }, {
     include: ["position-sticky"]
   })
-  .doMatched(gh.doMatched)
-  .undoUnmatched(gh.undoUnmatched)
+  .doMatched(gosh.doMatched)
+  .undoUnmatched(gosh.undoUnmatched)
 
   // Export this whole thing at the end
-  window.goshHangIt = gh;
+  window.goshHangIt = gosh;
 
 })(window, document);
