@@ -8,14 +8,53 @@
   var hangables = ['\'', '"', '‘', '’', '“', '”', ',', '.', '،', '۔', '、', '。', '，', '．', '﹐', '﹑', '﹒', '｡', '､'];
 
   // Hangable object
-  function Hangable(el) {
+  function Hangable(el, matchedEl) {
     this.el = el;
+    this.container = matchedEl;
+
+    this.width = this.getRelativeWidth();
+
+    this.hang();
+  }
+
+  Hangable.prototype.getRelativePosition = function() {
+    var containerOffset, elOffset;
+
+    containerOffset = this.getContainerTrueOffset();
+    elOffset = this.el.offsetLeft;
+
+    return elOffset - containerOffset;
+  }
+
+  Hangable.prototype.getRelativeWidth = function() {
+    return this.el.offsetWidth;
+  }
+
+  Hangable.prototype.hang = function() {
+    if (this.getRelativePosition() == 0) {
+      this.el.style.marginLeft = (-1 * this.getRelativeWidth()) + 'px';
+    }
+  }
+
+  Hangable.prototype.getContainerTrueOffset = function() {
+    // Borders count toward the offset, believe it or not
+
+    var containerOffset = this.container.offsetLeft,
+        containerStyle,
+        containerBorder;
+
+    containerStyle = getComputedStyle(this.container, null);
+    containerBorder = containerStyle.getPropertyValue('border-left-width');
+
+    return containerOffset + parseInt(containerBorder, 10);
   }
 
   // Monolithic objecty thing
   var gosh = {};
 
   gosh.wrapHangables = function(el) {
+    // Wrap hangable characters in an easily queryable and styleable span
+
     var nodes = el.childNodes,
         matchChars = new RegExp('[' + hangables.join('|') + ']', 'g');
 
@@ -32,7 +71,7 @@
             temp = document.createElement('span');
 
         text = text.replace(matchChars, function(match) {
-          return '<span data-hang style="color: red;">' + match + '</span>';
+          return '<span data-hang>' + match + '</span>';
         });
 
         temp.innerHTML = text;
@@ -43,15 +82,24 @@
     }
   }
 
-  gosh.instantiateHangables = function() {
-    var hangables = document.querySelectorAll('[data-hang]');
-    console.log(hangables);
+  gosh.instantiateHangables = function(matchedEl) {
+    // Make a new Hangable object to manage each hangable character
+
+    var chars = document.querySelectorAll('[data-hang]');
+
+    for (var i = 0; i < chars.length; ++i) {
+      var char = chars[i];
+
+      var hangable = new Hangable(char, matchedEl);
+    }
   }
 
   gosh.doMatched = function(rules) {
     rules.each(function(rule) {
-      gosh.wrapHangables(document.querySelectorAll( rule.getSelectors() )[0]);
-      gosh.instantiateHangables();
+      var matchedEl = document.querySelectorAll( rule.getSelectors() )[0];
+
+      gosh.wrapHangables(matchedEl);
+      gosh.instantiateHangables(matchedEl);
     });
   }
 
