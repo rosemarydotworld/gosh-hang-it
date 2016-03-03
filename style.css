@@ -35,6 +35,19 @@ p + p {
 }
 
 /**
+  At some point we might want to display some code samples. They should look nice!
+*/
+code {
+  color: #666;
+  font-size: 16px;
+
+  padding: 2px 2px;
+
+  background-color: #eee;
+  border-radius: 2px;
+}
+
+/**
   Finally, here's the main attraction. It might look like crapnasty unsupported
   CSS to you now, but just wait and see if you don't change your mind.
 */
