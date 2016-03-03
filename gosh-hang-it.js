@@ -42,6 +42,13 @@
     }
   }
 
+  gosh.unwrapHangables = function(el) {
+    // Unwrap hangable characters to get the DOM mostly back to normal
+
+    var nodes = el.childNodes;
+    console.log(nodes);
+  }
+
   gosh.instantiateHangables = function() {
     // Make a new Hangable object to manage each hangable character
 
@@ -63,8 +70,10 @@
     });
   }
 
-  gosh.undoUnmatched = function(rules) {
-
+  gosh.unhangAll = function(rules) {
+    gosh.chars.forEach(function(char) {
+      char.unhang().destroy();
+    });
   }
 
   // Hangable object
@@ -72,7 +81,6 @@
     this.el = el;
     this.container = this.getFirstBlockParent();
 
-    this.width = this.getRelativeWidth();
     this.hang();
 
     gosh.chars.push(this);
@@ -103,13 +111,34 @@
   }
 
   Hangable.prototype.getRelativeWidth = function() {
-    return this.el.offsetWidth;
+    return (this.el.offsetWidth / this.getContainerWidth());
   }
 
   Hangable.prototype.hang = function() {
+    this.el.style.marginLeft = '';
+
     if (this.getRelativePosition() == 0) {
-      this.el.style.marginLeft = (-1 * this.getRelativeWidth()) + 'px';
+      this.el.style.marginLeft = (-100 * this.getRelativeWidth()) + '%';
     }
+
+    return this;
+  }
+
+  Hangable.prototype.unhang = function() {
+    // get the element's parent node
+    var parent = this.el.parentNode;
+
+    // move all children out of the element
+    while (this.el.firstChild) parent.insertBefore(this.el.firstChild, this.el);
+
+    // remove the empty element
+    parent.removeChild(this.el);
+
+    return this;
+  }
+
+  Hangable.prototype.destroy = function() {
+    delete this;
   }
 
   Hangable.prototype.getContainerTrueOffset = function() {
@@ -119,14 +148,25 @@
     return containerOffset;
   }
 
+  Hangable.prototype.getContainerWidth = function() {
+    return this.container.clientWidth;
+  }
+
   // Set up the polyfill
-  Polyfill({
-    declarations: ["hanging-punctuation:first"]
-  }, {
-    include: ["position-sticky"]
-  })
-  .doMatched(gosh.doMatched)
-  .undoUnmatched(gosh.undoUnmatched)
+  window.onload = function() {
+    Polyfill({
+      declarations: ["hanging-punctuation:first"]
+    })
+    .doMatched(gosh.doMatched)
+    .undoUnmatched(gosh.unhangAll);
+  }
+
+  // Make it Responsive(tm)
+  window.onresize = function() {
+    gosh.chars.forEach(function(char) {
+      char.hang();
+    });
+  }
 
   // Export this whole thing at the end
   window.goshHangIt = gosh;
