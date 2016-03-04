@@ -48,6 +48,18 @@ code {
 }
 
 /**
+  Let's also make sure links look okay
+*/
+a {
+  color: #222;
+  text-decoration: none;
+  box-shadow: 0 5px 0 #D3E8F6;
+}
+a:hover {
+  color: #268BD2;
+}
+
+/**
   Finally, here's the main attraction. It might look like crapnasty unsupported
   CSS to you now, but just wait and see if you don't change your mind.
 */
