@@ -36,8 +36,8 @@
 
         temp.innerHTML = text;
 
-        node.parentElement.insertBefore(temp, node);
-        node.parentElement.removeChild(node);
+        node.parentNode.insertBefore(temp, node);
+        node.parentNode.removeChild(node);
       }
     }
   }
