@@ -15,8 +15,7 @@
   gosh.wrapHangables = function(el) {
     // Wrap hangable characters in an easily queryable and styleable span
 
-    var nodes = el.childNodes,
-        matchChars = new RegExp('[' + hangables.join('|') + ']', 'g');
+    var nodes = el.childNodes;
 
     for (var i = 0; i < nodes.length; ++i) {
       var node = nodes[i];
@@ -25,21 +24,27 @@
         // Recurse elements: gotta get to the juicy text nodes inside the HTML
         gosh.wrapHangables(node);
       } else if(node.nodeType == 3) {
-        // For text nodes, wrap the hangable characters in spans and then wrap
-        // that whole mess in another span so we can operate upon it in HTML
-        var text = node.textContent,
-            temp = document.createElement('span');
-
-        text = text.replace(matchChars, function(match) {
-          return '<span data-hang>' + match + '</span>';
-        });
-
-        temp.innerHTML = text;
-
-        node.parentNode.insertBefore(temp, node);
-        node.parentNode.removeChild(node);
+        gosh.wrapCharactersInTextNode(node);
       }
     }
+  }
+
+  gosh.wrapCharactersInTextNode = function(node) {
+    // For text nodes, wrap the hangable characters in spans and then wrap
+    // that whole mess in another span so we can operate upon it in HTML
+
+    var text = node.textContent,
+        temp = document.createElement('span'),
+        matchChars = new RegExp('[' + hangables.join('|') + ']', 'g');
+
+    text = text.replace(matchChars, function(match) {
+      return '<span data-hang>' + match + '</span>';
+    });
+
+    temp.innerHTML = text;
+
+    node.parentNode.insertBefore(temp, node);
+    node.parentNode.removeChild(node);
   }
 
   gosh.unwrapHangables = function(el) {
@@ -142,7 +147,7 @@
   }
 
   Hangable.prototype.getContainerTrueOffset = function() {
-    // Borders count toward the offset, believe it or not
+    // Get the container's offset, minus borders or any other interloping spaces
 
     var containerOffset = this.container.offsetLeft + this.container.clientLeft;
     return containerOffset;
