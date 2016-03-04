@@ -15,8 +15,7 @@
   gosh.wrapHangables = function(el) {
     // Wrap hangable characters in an easily queryable and styleable span
 
-    var nodes = el.childNodes,
-        matchChars = new RegExp('[' + hangables.join('|') + ']', 'g');
+    var nodes = el.childNodes;
 
     for (var i = 0; i < nodes.length; ++i) {
       var node = nodes[i];
@@ -35,7 +34,8 @@
     // that whole mess in another span so we can operate upon it in HTML
 
     var text = node.textContent,
-        temp = document.createElement('span');
+        temp = document.createElement('span'),
+        matchChars = new RegExp('[' + hangables.join('|') + ']', 'g');
 
     text = text.replace(matchChars, function(match) {
       return '<span data-hang>' + match + '</span>';
