@@ -4,7 +4,7 @@
   "use strict";
 
   // Array of hangable punctuation characters
-  var hangables = ['\'', '"', '‘', '’', '“', '”', ',', '.', '،', '۔', '、', '。', '，', '．', '﹐', '﹑', '﹒', '｡', '､'];
+  var hangables = ['\'', '"', '‘', '’', '“', '”', ',', '.', '،', '۔', '、', '。', '，', '．', '﹐', '﹑', '﹒', '｡', '､', '«', '»'];
 
   // Monolithic objecty thing
   var gosh = {};
