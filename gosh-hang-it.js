@@ -4,7 +4,7 @@
   "use strict";
 
   // Array of hangable punctuation characters
-  var hangables = ['\'', '"', '‘', '’', '“', '”', ',', '.', '،', '۔', '、', '。', '，', '．', '﹐', '﹑', '﹒', '｡', '､'];
+  var hangables = ['\'', '"', '‘', '’', '“', '”', ',', '.', '،', '۔', '、', '。', '，', '．', '﹐', '﹑', '﹒', '｡', '､', '«', '»'];
 
   // Don't wrap characters in tags that contain non-display text
   var disallowedNodes = ['title', 'head', 'script', 'style'];
