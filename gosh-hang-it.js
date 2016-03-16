@@ -6,6 +6,9 @@
   // Array of hangable punctuation characters
   var hangables = ['\'', '"', '‘', '’', '“', '”', ',', '.', '،', '۔', '、', '。', '，', '．', '﹐', '﹑', '﹒', '｡', '､'];
 
+  // Don't wrap characters in tags that contain non-display text
+  var disallowedNodes = ['title', 'head', 'script', 'style'];
+
   // Monolithic objecty thing
   var gosh = {};
 
@@ -14,6 +17,11 @@
 
   gosh.wrapHangables = function(el) {
     // Wrap hangable characters in an easily queryable and styleable span
+
+    // but first make sure that we're not after a non-hangable node
+    if (disallowedNodes.indexOf(el.nodeName.toLowerCase()) != -1) {
+      return false;
+    }
 
     var nodes = el.childNodes;
 
@@ -27,6 +35,8 @@
         gosh.wrapCharactersInTextNode(node);
       }
     }
+
+    gosh.trimEmptyContainers();
   }
 
   gosh.wrapCharactersInTextNode = function(node) {
@@ -41,10 +51,23 @@
       return '<span data-hang>' + match + '</span>';
     });
 
+    temp.setAttribute('data-hang-container', 'true');
     temp.innerHTML = text;
 
     node.parentNode.insertBefore(temp, node);
     node.parentNode.removeChild(node);
+  }
+
+  gosh.trimEmptyContainers = function() {
+    var empties = document.querySelectorAll( '[data-hang-container]' );
+
+    for (var i = 0; i < empties.length; ++i) {
+      var empty = empties[i];
+
+      if (empty.innerHTML.match(/^\s*$/)) {
+        empty.remove();
+      }
+    }
   }
 
   gosh.unwrapHangables = function(el) {
