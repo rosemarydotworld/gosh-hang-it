@@ -36,7 +36,7 @@
       }
     }
 
-    gosh.trimEmptyContainers();
+    gosh.trimEmptyWrappers();
   }
 
   gosh.wrapCharactersInTextNode = function(node) {
@@ -51,15 +51,15 @@
       return '<span data-hang>' + match + '</span>';
     });
 
-    temp.setAttribute('data-hang-container', 'true');
+    temp.setAttribute('data-hang-wrapper', 'true');
     temp.innerHTML = text;
 
     node.parentNode.insertBefore(temp, node);
     node.parentNode.removeChild(node);
   }
 
-  gosh.trimEmptyContainers = function() {
-    var empties = document.querySelectorAll( '[data-hang-container]' );
+  gosh.trimEmptyWrappers = function() {
+    var empties = document.querySelectorAll( '[data-hang-wrapper]' );
 
     for (var i = 0; i < empties.length; ++i) {
       var empty = empties[i];
@@ -87,10 +87,6 @@
 
       var hangable = new Hangable(char);
     }
-
-    gosh.chars.some(function(char) {
-      char.hang();
-    });
   }
 
   gosh.doMatched = function(rules) {
@@ -112,8 +108,11 @@
   function Hangable(el) {
     this.el = el;
     this.container = this.getFirstBlockParent();
+    this.wrapper = this.container.querySelector('[data-hang-wrapper]');
 
     gosh.chars.push(this);
+
+    this.hang();
   }
 
   Hangable.prototype.getFirstBlockParent = function() {
@@ -147,7 +146,7 @@
   Hangable.prototype.hang = function() {
     this.el.style.marginLeft = '';
 
-    if (this.getRelativePosition() == 0) {
+    if (this.getRelativePosition() == 0 && this.el === this.wrapper.firstElementChild) {
       this.el.style.marginLeft = (-100 * this.getRelativeWidth()) + '%';
 
       return true;
@@ -195,7 +194,7 @@
 
   // Make it Responsive(tm)
   window.onresize = function() {
-    gosh.chars.some(function(char) {
+    gosh.chars.forEach(function(char) {
       char.hang();
     });
   }
