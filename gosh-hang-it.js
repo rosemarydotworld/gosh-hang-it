@@ -4,10 +4,7 @@
   "use strict";
 
   // Array of hangable punctuation characters
-  var hangables = ['\'', '"', '‘', '’', '“', '”', ',', '.', '،', '۔', '、', '。', '，', '．', '﹐', '﹑', '﹒', '｡', '､'];
-
-  // Don't wrap characters in tags that contain non-display text
-  var disallowedNodes = ['title', 'head', 'script', 'style'];
+  var hangables = ['\'', '"', '‘', '’', '“', '”', ',', '.', '،', '۔', '、', '。', '，', '．', '﹐', '﹑', '﹒', '｡', '､', '«', '»'];
 
   // Monolithic objecty thing
   var gosh = {};
@@ -17,11 +14,6 @@
 
   gosh.wrapHangables = function(el) {
     // Wrap hangable characters in an easily queryable and styleable span
-
-    // but first make sure that we're not after a non-hangable node
-    if (disallowedNodes.indexOf(el.nodeName.toLowerCase()) != -1) {
-      return false;
-    }
 
     var nodes = el.childNodes;
 
@@ -35,8 +27,6 @@
         gosh.wrapCharactersInTextNode(node);
       }
     }
-
-    gosh.trimEmptyContainers();
   }
 
   gosh.wrapCharactersInTextNode = function(node) {
@@ -51,23 +41,10 @@
       return '<span data-hang>' + match + '</span>';
     });
 
-    temp.setAttribute('data-hang-container', 'true');
     temp.innerHTML = text;
 
     node.parentNode.insertBefore(temp, node);
     node.parentNode.removeChild(node);
-  }
-
-  gosh.trimEmptyContainers = function() {
-    var empties = document.querySelectorAll( '[data-hang-container]' );
-
-    for (var i = 0; i < empties.length; ++i) {
-      var empty = empties[i];
-
-      if (empty.innerHTML.match(/^\s*$/)) {
-        empty.remove();
-      }
-    }
   }
 
   gosh.unwrapHangables = function(el) {
@@ -87,6 +64,10 @@
 
       var hangable = new Hangable(char);
     }
+
+    gosh.chars.some(function(char) {
+      char.hang();
+    });
   }
 
   gosh.doMatched = function(rules) {
@@ -108,8 +89,6 @@
   function Hangable(el) {
     this.el = el;
     this.container = this.getFirstBlockParent();
-
-    this.hang();
 
     gosh.chars.push(this);
   }
@@ -147,9 +126,11 @@
 
     if (this.getRelativePosition() == 0) {
       this.el.style.marginLeft = (-100 * this.getRelativeWidth()) + '%';
+
+      return true;
     }
 
-    return this;
+    return false;
   }
 
   Hangable.prototype.unhang = function() {
@@ -191,7 +172,7 @@
 
   // Make it Responsive(tm)
   window.onresize = function() {
-    gosh.chars.forEach(function(char) {
+    gosh.chars.some(function(char) {
       char.hang();
     });
   }

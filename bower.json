@@ -1,0 +1,22 @@
+{
+  "name": "gosh-hang-it",
+  "description": "Polyfill for hanging-punctuation CSS property",
+  "main": "gosh-hang-it.js",
+  "authors": [
+    "Liam Campbell"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "typography",
+    "polyfill"
+  ],
+  "homepage": "https://github.com/liamdanger/gosh-hang-it",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
