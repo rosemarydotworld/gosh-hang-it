@@ -64,6 +64,10 @@
 
       var hangable = new Hangable(char);
     }
+
+    gosh.chars.some(function(char) {
+      char.hang();
+    });
   }
 
   gosh.doMatched = function(rules) {
@@ -85,8 +89,6 @@
   function Hangable(el) {
     this.el = el;
     this.container = this.getFirstBlockParent();
-
-    this.hang();
 
     gosh.chars.push(this);
   }
@@ -124,9 +126,11 @@
 
     if (this.getRelativePosition() == 0) {
       this.el.style.marginLeft = (-100 * this.getRelativeWidth()) + '%';
+
+      return true;
     }
 
-    return this;
+    return false;
   }
 
   Hangable.prototype.unhang = function() {
@@ -168,7 +172,7 @@
 
   // Make it Responsive(tm)
   window.onresize = function() {
-    gosh.chars.forEach(function(char) {
+    gosh.chars.some(function(char) {
       char.hang();
     });
   }
