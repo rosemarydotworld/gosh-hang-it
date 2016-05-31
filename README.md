@@ -13,4 +13,4 @@ Gosh Hang It has one dependency, and that's `polyfill.js`. It's included in the 
 
 ---
 
-![Hang in there](http://ephemera.muledesign.com/hang-in-there.jpg))
+![Hang in there](http://ephemera.muledesign.com/hang-in-there.jpg)
