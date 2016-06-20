@@ -93,8 +93,10 @@
     rules.each(function(rule) {
       var matchedEl = document.querySelectorAll( rule.getSelectors() )[0];
 
-      gosh.wrapHangables(matchedEl);
-      gosh.instantiateHangables();
+      if(matchedEl) {
+        gosh.wrapHangables(matchedEl);
+        gosh.instantiateHangables();
+      }
     });
   }
 
